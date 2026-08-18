@@ -1,0 +1,13 @@
+﻿services:
+#  labdiag.web:
+#    image: labdiag.web
+#    build:
+#      context: .
+#      dockerfile: LabDiag.Web/Dockerfile
+
+
+    labdiag.db:
+      restart: always
+      image: postgres:18-alpine3.24
+      env_file: db.env
+      
