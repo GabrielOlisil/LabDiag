@@ -9,5 +9,7 @@
     labdiag.db:
       restart: always
       image: postgres:18-alpine3.24
+      ports:
+        - '5432:5432'
       env_file: db.env
       

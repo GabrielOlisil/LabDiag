@@ -7,9 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="DTO\" />
-      <Folder Include="Entity\" />
-      <Folder Include="Interface\" />
+      <Folder Include="Enums\" />
     </ItemGroup>
 
 </Project>
