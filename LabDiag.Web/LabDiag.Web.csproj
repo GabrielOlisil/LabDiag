@@ -7,9 +7,11 @@
         <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <UserSecretsId>ee4fe6e4-a135-4292-938e-c375bf36b731</UserSecretsId>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.11" />
       <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.11">
         <PrivateAssets>all</PrivateAssets>
@@ -22,7 +24,6 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
       <PackageReference Include="Scalar.AspNetCore" Version="2.16.20" />
     </ItemGroup>
@@ -33,6 +34,7 @@
 
     <ItemGroup>
       <Folder Include="Api\V1\Controller\" />
+      <Folder Include="keycloak\" />
     </ItemGroup>
 
 </Project>

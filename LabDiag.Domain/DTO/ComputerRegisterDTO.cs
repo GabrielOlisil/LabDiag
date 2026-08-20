@@ -1,15 +1,22 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace LabDiag.Domain.DTO;
 
 public record ComputerRegisterDTO
 {
-    public ICollection<NicPropertiesDTO> Nics { get; set; } = new List<NicPropertiesDTO>();
+    [Required]
+    public required ICollection<NicPropertiesDto> Nics { get; set; } = new List<NicPropertiesDto>();
 }
 
-public record NicPropertiesDTO
+public record NicPropertiesDto
 {
-    public string Name { get; set; }
-    public string LinkSpeed { get; set; }
-    public string Description { get; set; }
-    public string MacAddress { get; set; }
-    public string Status { get; set; }
+    [Required]
+    public required string Name { get; set; }
+    [Required]
+    public required string LinkSpeed { get; set; }
+    [Required]
+    public required string Description { get; set; }
+    public required string MacAddress { get; set; }
+    [Required]
+    public string? Status { get; set; }
 }

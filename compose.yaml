@@ -8,8 +8,53 @@
 
     labdiag.db:
       restart: always
+      container_name: labdiag-postgres
+
       image: postgres:18-alpine3.24
       ports:
-        - '5432:5432'
-      env_file: db.env
+        - '127.0.0.1:5431:5432'
+      environment:
+        POSTGRES_PASSWORD: SenhaForte*
+      volumes:
+        - labdiagdata:/var/lib/postgresql/
       
+    
+    kc.db:
+      image: postgres:18-alpine3.24
+      container_name: kc-postgres
+      restart: unless-stopped
+      environment:
+        POSTGRES_USER: kc
+        POSTGRES_PASSWORD: sua_senha_local
+        POSTGRES_DB: kc
+      ports:
+        - "127.0.0.1:5432:5432"
+      volumes:
+        - kcdata:/var/lib/postgresql/
+        
+
+    kc.app:
+      image: quay.io/keycloak/keycloak:26.7.2
+      container_name: kc-app
+      command: start-dev
+      environment:
+        KC_DB: postgres
+        KC_DB_URL_HOST: kc.db
+        KC_DB_URL_PORT: 5432
+        KC_DB_URL_DATABASE: kc 
+        KC_DB_USERNAME: kc
+        KC_DB_PASSWORD: sua_senha_local
+        KC_BOOTSTRAP_ADMIN_USERNAME: admin
+        KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+        KC_HTTP_ENABLED: "true"
+        KC_HOSTNAME_STRICT: "false"
+      ports:
+        - "127.0.0.1:8080:8080"
+      depends_on:
+        - kc.db
+      volumes:
+        - ./keycloak-data:/opt/keycloak/data/import
+
+volumes:
+  labdiagdata:
+  kcdata:

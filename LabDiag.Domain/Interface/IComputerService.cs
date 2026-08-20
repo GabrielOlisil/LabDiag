@@ -10,4 +10,6 @@ public interface IComputerService
 
     Task<Computer> CreateComputer(string hostName, ComputerRegisterDTO computerRegister,
         CancellationToken cancellationToken);
+
+    Task<List<Computer>> GetAllComputers(CancellationToken cancellationToken = default);
 }

@@ -3,7 +3,10 @@ using LabDiag.Domain.Interface;
 using LabDiag.Web.Api.V1.Service;
 using LabDiag.Web.Components;
 using LabDiag.Web.Database;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,19 +23,58 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+    })
+.AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, oidcOptions =>
+{
+    
+    oidcOptions.PushedAuthorizationBehavior = PushedAuthorizationBehavior.UseIfAvailable;
+    oidcOptions.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    
+    oidcOptions.ClientSecret = builder.Configuration["Authentication:Schemes:MicrosoftOidc:ClientSecret"]
+                               ?? throw new InvalidOperationException("ClientSecret não encontrado nos secrets.");
+    
+    oidcOptions.SaveTokens = true;
+    oidcOptions.Authority = builder.Configuration["OIDC:Authority"];
+    oidcOptions.ClientId = builder.Configuration["OIDC:ClientId"];
+    oidcOptions.ResponseType = OpenIdConnectResponseType.Code;
+    oidcOptions.RequireHttpsMetadata = false;
+    oidcOptions.MapInboundClaims = false;
+    oidcOptions.TokenValidationParameters.NameClaimType = "name";
+    oidcOptions.TokenValidationParameters.RoleClaimType = "roles";
+    oidcOptions.Scope.Add(OpenIdConnectScope.OpenIdProfile);
+    
+    oidcOptions.Scope.Add("email");
+    oidcOptions.Scope.Add(OpenIdConnectScope.OfflineAccess);
+    oidcOptions.Scope.Add("roles");
+    
+    
+})
+.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
+
+
+builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddHttpContextAccessor();
+
+
 
 builder.Services.AddDbContextPool<WebContext>(opt => 
     opt.UseNpgsql(builder.Configuration.GetConnectionString("LabDiagConnection")));
 
 var app = builder.Build();
 
-app.MapControllers();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
+    app.UseHttpsRedirection();
+    
 }
 else
 {
@@ -43,11 +85,14 @@ else
 
 
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
-app.UseHttpsRedirection();
 
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
