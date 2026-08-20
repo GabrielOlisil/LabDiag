@@ -17,6 +17,16 @@ public class ComputerService(WebContext context): IComputerService
         
         return computer;
     }
+    
+    
+    public async Task<List<Computer>> GetAllComputers(CancellationToken cancellationToken = default)
+    {
+
+        var computers = await context.Computer.Include(c => c.Nic).AsNoTracking().ToListAsync(cancellationToken);
+        
+        return computers;
+    }
+    
 
     public async Task<Computer> CreateComputer(string hostName, ComputerRegisterDTO computerRegister, CancellationToken cancellationToken = default)
     {

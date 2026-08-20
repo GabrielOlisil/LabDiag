@@ -30,7 +30,7 @@ namespace LabDiag.Web.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    HostName = table.Column<string>(type: "text", nullable: true),
+                    HostName = table.Column<string>(type: "text", nullable: false),
                     ActiveNic = table.Column<Guid>(type: "uuid", nullable: true),
                     RegistredHost = table.Column<bool>(type: "boolean", nullable: false),
                     LabId = table.Column<Guid>(type: "uuid", nullable: true)

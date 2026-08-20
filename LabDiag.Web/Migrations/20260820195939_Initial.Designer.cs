@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LabDiag.Web.Migrations
 {
     [DbContext(typeof(WebContext))]
-    [Migration("20260819221906_Initial")]
+    [Migration("20260820195939_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -35,6 +35,7 @@ namespace LabDiag.Web.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("HostName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid?>("LabId")

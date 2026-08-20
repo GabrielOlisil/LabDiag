@@ -32,6 +32,7 @@ namespace LabDiag.Web.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("HostName")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid?>("LabId")

@@ -10,4 +10,15 @@ public class NicService(WebContext context): INicService
     {
         return await context.Nic.FindAsync([nicId], cancellationToken: cancellationToken);
     }
+
+
+    public async Task<int> UptadeNicLinkSpeed(Guid nicId, string linkSpeed,
+        CancellationToken cancellationToken = default)
+    {
+        var nic = await context.Nic.FindAsync([nicId], cancellationToken: cancellationToken);
+        
+        nic?.LinkSpeed = linkSpeed;
+        
+        return await context.SaveChangesAsync(cancellationToken);
+    }
 }
