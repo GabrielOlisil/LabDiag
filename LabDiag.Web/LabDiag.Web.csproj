@@ -32,9 +32,5 @@
       <ProjectReference Include="..\LabDiag.Domain\LabDiag.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Api\V1\Controller\" />
-      <Folder Include="keycloak\" />
-    </ItemGroup>
 
 </Project>

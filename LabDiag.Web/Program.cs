@@ -3,6 +3,7 @@ using LabDiag.Domain.Interface;
 using LabDiag.Web.Api.V1.Service;
 using LabDiag.Web.Components;
 using LabDiag.Web.Database;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +37,19 @@ builder.Services.AddAuthentication(options =>
     
     oidcOptions.ClientSecret = builder.Configuration["Authentication:Schemes:MicrosoftOidc:ClientSecret"]
                                ?? throw new InvalidOperationException("ClientSecret não encontrado nos secrets.");
+    
+    
+    oidcOptions.Events = new OpenIdConnectEvents
+    {
+        OnRedirectToIdentityProviderForSignOut = async context =>
+        {
+            var idToken = await context.HttpContext.GetTokenAsync("id_token");
+            if (!string.IsNullOrEmpty(idToken))
+            {
+                context.ProtocolMessage.IdTokenHint = idToken;
+            }
+        }
+    };
     
     oidcOptions.SaveTokens = true;
     oidcOptions.Authority = builder.Configuration["OIDC:Authority"];
@@ -92,6 +106,17 @@ app.MapStaticAssets();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+
+app.MapPost("/authentication/logout", async (HttpContext context) =>
+{
+    await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+    await context.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
+    {
+        RedirectUri = "/" 
+    });
+});
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
