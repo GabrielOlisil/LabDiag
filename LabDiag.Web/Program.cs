@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Scalar.AspNetCore;
 
@@ -55,15 +56,17 @@ builder.Services.AddAuthentication(options =>
     oidcOptions.Authority = builder.Configuration["OIDC:Authority"];
     oidcOptions.ClientId = builder.Configuration["OIDC:ClientId"];
     oidcOptions.ResponseType = OpenIdConnectResponseType.Code;
-    oidcOptions.RequireHttpsMetadata = false;
+    oidcOptions.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+    oidcOptions.GetClaimsFromUserInfoEndpoint = true;
     oidcOptions.MapInboundClaims = false;
     oidcOptions.TokenValidationParameters.NameClaimType = "name";
     oidcOptions.TokenValidationParameters.RoleClaimType = "roles";
-    oidcOptions.Scope.Add(OpenIdConnectScope.OpenIdProfile);
     
+    oidcOptions.Scope.Clear();
+    oidcOptions.Scope.Add("openid");
+    oidcOptions.Scope.Add("profile");
     oidcOptions.Scope.Add("email");
-    oidcOptions.Scope.Add(OpenIdConnectScope.OfflineAccess);
-    oidcOptions.Scope.Add("roles");
+    oidcOptions.Scope.Add("offline_access");
     
     
 })
@@ -117,6 +120,16 @@ app.MapPost("/authentication/logout", async (HttpContext context) =>
         RedirectUri = "/" 
     });
 });
+
+app.MapGet("/authentication/login", (string? returnUrl) =>
+{
+    var props = new AuthenticationProperties
+    {
+        RedirectUri = string.IsNullOrEmpty(returnUrl) ? "/" : returnUrl
+    };
+    return Results.Challenge(props, [OpenIdConnectDefaults.AuthenticationScheme]);
+});
+
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
